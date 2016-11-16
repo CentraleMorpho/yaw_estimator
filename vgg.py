@@ -15,7 +15,7 @@ def conv_op(input_op, name, kw, kh, n_out, dw, dh):
                                  shape=[kh, kw, n_in, n_out],
                                  dtype=tf.float32, 
                                  initializer=tf.contrib.layers.xavier_initializer_conv2d())
-        conv = tf.nn.conv2d(input_op, kernel, (1, dh, dw, 1), padding='SAME')
+        conv = tf.nn.conv2d(input_op, kernel, (1, dh, dw,1), padding='SAME')
         bias_init_val = tf.constant(0.0, shape=[n_out], dtype=tf.float32)
         biases = tf.Variable(bias_init_val, trainable=True, name='b')
         z = tf.reshape(tf.nn.bias_add(conv, biases), conv.get_shape())
@@ -42,27 +42,18 @@ def mpool_op(input_op, name, kh, kw, dh, dw):
                           name=name)
 
 def loss_op(logits, labels, batch_size):
-    labels = tf.expand_dims(labels, 1)
-    indices = tf.expand_dims(tf.range(0, batch_size, 1), 1)
-    concated = tf.concat(1, [indices, labels])
-    onehot_labels = tf.sparse_to_dense(concated, tf.pack([batch_size, 10]), 1.0, 0.0)
-    cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, onehot_labels, name='xentropy')
-    loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
+    #labels = tf.expand_dims(labels, 1)
+    #indices = tf.expand_dims(tf.range(0, batch_size, 1), 1)
+    #concated = tf.concat(1, [indices, labels])
+    #onehot_labels = tf.sparse_to_dense(concated, tf.pack([batch_size, 10]), 1.0, 0.0)
+    #cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, onehot_labels, name='xentropy')
+    #loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
+    loss = tf.nn.l2_loss(logits-labels)
     return loss
 
 
 
 def evaluate_op(predictions, labels):
-    """Evaluate the quality of the predictions at predicting the label.
-
-    Args:
-        logits: Logits tensor, float - [batch_size, NUM_CLASSES].
-        labels: Labels tensor, int32 - [batch_size], with values in the range [0, NUM_CLASSES).
-    Returns:
-        A scalar int32 tensor with the number of examples (out of batch_size)
-        that were predicted correctly.
-
-    """
     # For a classifier model, we can use the in_top_k Op.
     # It returns a bool tensor with shape [batch_size] that is true for
     # the examples where the label's is was in the top k (here k=1)
@@ -162,7 +153,5 @@ def inference_cifar10_vgg(input_op, training=False):
     fc7 = fc_op(fc6_drop, name="fc7", n_out=1024)
     fc7_drop = tf.nn.dropout(fc7, dropout_keep_prob, name="fc7_drop")
 
-    fc8 = fc_op(fc7_drop, name="fc8", n_out=10)
-    softmax = tf.nn.softmax(fc8)
-    predictions = tf.argmax(softmax, 1)
-    return predictions, softmax, fc8
+    fc8 = fc_op(fc7_drop, name="fc8", n_out=3)
+    return fc8
