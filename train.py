@@ -18,7 +18,7 @@ def train(data, dataLabels, lr=0.01,
         logits = model.inference_cifar10_vgg(images, training=True)
         # predictions, softmax, logits = model.inference_op(images, training=True)
         objective = model.loss_op(logits, labels, batch_size)
-        #accuracy, total_correct = model.evaluate_op(logits, labels)
+        #approx_correct = model.evaluate_op(logits, labels)
 	accuracy = objective
         optimizer = tf.train.AdamOptimizer(lr)
         global_step = tf.Variable(0, name="global_step", trainable=False)
@@ -41,7 +41,6 @@ def train(data, dataLabels, lr=0.01,
 
                     t0 = time.time()
                     result = sess.run(
-                        #[train_step, objective, accuracy, predictions],
 			[train_step, accuracy, logits],
                         feed_dict = {
                             images: X,

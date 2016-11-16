@@ -134,7 +134,7 @@ def inference_cifar10_vgg(input_op, training=False):
     #pool2 = mpool_op(conv2_2,   name="pool2",   kh=2, kw=2, dh=2, dw=2)
 
     conv2_1 = tf.nn.dropout(conv_op(pool1,    name="conv2_1", kh=3, kw=3, n_out=64, dh=1, dw=1), dropout_keep_prob)
-    conv2_2 = tf.nn.dropout(conv_op(conv2_1,  name="conv2_2", kh=3, kw=3, n_out=64, dh=1, dw=1), dropout_keep_prob)
+    conv2_2 = tf.nn.dropout(conv_op(conv2_1,  name="conv2_2", kh=3, kw=3, n_out=32, dh=1, dw=1), dropout_keep_prob)
     pool2 = mpool_op(conv2_2,   name="pool2",   kh=2, kw=2, dh=2, dw=2)
 
     # # block 3 -- outputs 28x28x256
@@ -142,8 +142,8 @@ def inference_cifar10_vgg(input_op, training=False):
     #conv3_2 = tf.nn.dropout(conv_op(conv3_1,  name="conv3_2", kh=3, kw=3, n_out=64, dh=1, dw=1), dropout_keep_prob)
     #pool3 = mpool_op(conv3_2,   name="pool3",   kh=2, kw=2, dh=2, dw=2)
 
-    conv3_1 = tf.nn.dropout(conv_op(pool2,    name="conv3_1", kh=3, kw=3, n_out=128, dh=1, dw=1), dropout_keep_prob)
-    conv3_2 = tf.nn.dropout(conv_op(conv3_1,  name="conv3_2", kh=3, kw=3, n_out=128, dh=1, dw=1), dropout_keep_prob)
+    conv3_1 = tf.nn.dropout(conv_op(pool2,    name="conv3_1", kh=3, kw=3, n_out=64, dh=1, dw=1), dropout_keep_prob)
+    conv3_2 = tf.nn.dropout(conv_op(conv3_1,  name="conv3_2", kh=3, kw=3, n_out=64, dh=1, dw=1), dropout_keep_prob)
     pool3 = mpool_op(conv3_2,   name="pool3",   kh=2, kw=2, dh=2, dw=2)
 
     # block 4 -- outputs 14x14x512
@@ -152,23 +152,23 @@ def inference_cifar10_vgg(input_op, training=False):
     #conv4_3 = tf.nn.dropout(conv_op(conv4_2,  name="conv4_3", kh=3, kw=3, n_out=128, dh=1, dw=1), dropout_keep_prob)
     #pool4 = mpool_op(conv4_3,   name="pool4",   kh=2, kw=2, dh=2, dw=2)
 
-    conv4_1 = tf.nn.dropout(conv_op(pool3,    name="conv4_1", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
-    conv4_2 = tf.nn.dropout(conv_op(conv4_1,  name="conv4_2", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
-    conv4_3 = tf.nn.dropout(conv_op(conv4_2,  name="conv4_3", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
-    pool4 = mpool_op(conv4_3,   name="pool4",   kh=2, kw=2, dh=2, dw=2)
+    #conv4_1 = tf.nn.dropout(conv_op(pool3,    name="conv4_1", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
+    #conv4_2 = tf.nn.dropout(conv_op(conv4_1,  name="conv4_2", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
+    #conv4_3 = tf.nn.dropout(conv_op(conv4_2,  name="conv4_3", kh=3, kw=3, n_out=254, dh=1, dw=1), dropout_keep_prob)
+    #pool4 = mpool_op(conv4_3,   name="pool4",   kh=2, kw=2, dh=2, dw=2)
 
 
     # flatten
-    shp = pool4.get_shape()
+    shp = pool3.get_shape()
     flattened_shape = shp[1].value * shp[2].value * shp[3].value
-    resh1 = tf.reshape(pool4, [-1, flattened_shape], name="resh1")
+    resh1 = tf.reshape(pool3, [-1, flattened_shape], name="resh1")
 
     # fully connected
-    fc6 = fc_op(resh1, name="fc6", n_out=1024)
+    fc6 = fc_op(resh1, name="fc6", n_out=64)
     fc6_drop = tf.nn.dropout(fc6, dropout_keep_prob, name="fc6_drop")
 
-    fc7 = fc_op(fc6_drop, name="fc7", n_out=1024)
-    fc7_drop = tf.nn.dropout(fc7, dropout_keep_prob, name="fc7_drop")
+    #fc7 = fc_op(fc6_drop, name="fc7", n_out=1024)
+    #fc7_drop = tf.nn.dropout(fc7, dropout_keep_prob, name="fc7_drop")
 
-    fc8 = fc_op(fc7_drop, name="fc8", n_out=3)
+    fc8 = fc_op(fc6_drop, name="fc8", n_out=3)
     return fc8
