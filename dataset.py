@@ -6,8 +6,8 @@ def random_test_input():
     """
     this generates random test input, useful for debugging
     """
-    sz = 224
-    channels = 3
+    sz = 39
+    channels = 1
     init_val = tf.random_normal(
         (batch_size, sz, sz, channels),
         dtype=tf.float32,

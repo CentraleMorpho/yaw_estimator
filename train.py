@@ -2,29 +2,24 @@ import vgg as model
 import tensorflow as tf
 import numpy as np
 import time
+import firstscript
 
 
-def train(trn_generator,
-          val_generator,
-          steps_per_epoch,
-          lr=0.01,
+def train(data, labels, lr=0.01,
           nb_epochs=10,
-          batch_size=12,
-          training_log_path="train_log.csv"):
+          batch_size=12):
 
 
     with tf.Graph().as_default():
 
-        raw_images = tf.placeholder("float", [batch_size, 32, 32, 3])
-        images = tf.image.resize_images(raw_images, 128, 128)
+        images = tf.placeholder("float", [batch_size, 39, 39, 1])
         print images.get_shape()
         labels = tf.placeholder("int32", [batch_size])
         predictions, softmax, logits = model.inference_cifar10_vgg(images, training=True)
         # predictions, softmax, logits = model.inference_op(images, training=True)
         objective = model.loss_op(logits, labels, batch_size)
         accuracy, total_correct = model.evaluate_op(softmax, labels)
-        optimizer = tf.train.GradientDescentOptimizer(lr)
-        # optimizer = tf.train.AdamOptimizer(lr)
+        optimizer = tf.train.AdamOptimizer(lr)
         global_step = tf.Variable(0, name="global_step", trainable=False)
         train_step = optimizer.minimize(objective, global_step=global_step)
 
@@ -32,14 +27,12 @@ def train(trn_generator,
         with tf.Session() as sess:
             sess.run(tf.initialize_all_variables())
 
-            training_log = open(training_log_path, "w")
-            training_log.write("trn_loss,trn_acc\n")
 
             for epoch in range(nb_epochs):
 
-                for step in range(steps_per_epoch):
+                for step in range(3200/batch_size):
                     # get batch and format data
-                    batch = trn_generator.next()
+                    batch = getBatch(data, labels, step, batch_size)
                     X = np.array(batch[0])
                     Y = np.array(batch[1])
 
@@ -65,30 +58,18 @@ def train(trn_generator,
                         print(result[3])
 
 
-
-                    # if step % 10 == 0:
-                    #     examples_per_sec = batch_size/duration
-                    #     sec_per_batch = float(duration)
-                    #     format_str = '%s: step %d, loss = %.2f (%.1f examples/sec; %.3f sec/batch)'
-                    #     print(format_str % (datetime.now(), step, result[1], examples_per_sec, sec_per_batch))
-                    #
-                    # if step % 1000 == 0:
-                    #     print("%s: step %d, evaluating test set" % (datetime.now(), step))
-                    #     correct_count = 0
-                    #     num_tst_examples = tst[0].shape[0]
-                    #     for tst_idx in range(0, num_tst_examples, batch_size):
-                    #         X_tst = tst[0][tst_idx:np.min([tst_idx+batch_size, num_tst_examples]), :]
-                    #         X_tst = X_tst.reshape(-1, 3, 32, 32).transpose(0, 2, 3, 1)
-                    #         Y_tst = tst[1][tst_idx:np.min([tst_idx+batch_size, num_tst_examples])]
-                    #         correct_count += total_correct.eval({
-                    #             raw_images: X_tst,
-                    #             labels: Y_tst,
-                    #             dropout_keep_prob: 1.0
-                    #         })
-                    #     print("%s tst accuracy is = %s" % (datetime.now(), float(correct_count)/num_tst_examples))
+def getBatch(step, batch_size):
+	X = data(step*bach_size:(step+1)*bach_size,:,:)
+	Y = labels(step*bach_size:((step+1)*bach_size),:)
+	return [X,Y]
+                 
 
 if __name__ == '__main__':
     import dataset
     batch_size = 20
-    trn_generator, val_generator = dataset.get_cifar10(batch_size=batch_size)
-    train(trn_generator, val_generator, steps_per_epoch=50000/batch_size, batch_size=batch_size)
+    folder = '../Cropped/img_014b/GeneratedImgs/014b/Campagne_IR_Pose_20150710/cam1/1'
+
+
+    data = firstscript.load_dataset(folder)
+    labels = firstscript.findLabelsMatrix(folder)
+    train(data, labels,batch_size=batch_size)
