@@ -2,7 +2,6 @@ from datetime import datetime
 import math
 import time
 import numpy as np
-import dataset
 import tensorflow.python.platform
 import tensorflow as tf
 

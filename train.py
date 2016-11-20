@@ -3,10 +3,11 @@ import tensorflow as tf
 import numpy as np
 import time
 import firstscript
+import mydatasetbatches
 
 
-def train(data, dataLabels, lr=0.0001,
-          nb_epochs=10,
+def train(lr=0.0001,
+          nb_iterations=10000,
           batch_size=12):
 
 
@@ -28,49 +29,36 @@ def train(data, dataLabels, lr=0.0001,
             sess.run(tf.initialize_all_variables())
 
 
-            for epoch in range(nb_epochs):
+            for iteration in range(nb_iterations):
 
-                for step in range(3200/batch_size):
-                    # get batch and format data
-                    X,Y = getBatch(data, dataLabels, step, batch_size)
+		    # get batch and format data
+		    X, Y = mydatasetbatches.getBatch('training', batch_size)
 		   
-             
+	     
 		    X=X.reshape((batch_size, 39,39,1))
-                   
+		   
 
 
-                    t0 = time.time()
-                    result = sess.run(
+		    t0 = time.time()
+		    result = sess.run(
 			[train_step, objective, accuracy, logits],
-                        feed_dict = {
-                            images: X,
-                            labels: Y,
-                        }
-                    )
-                    trn_loss = result[1]
-                    trn_acc = result[2]
+		        feed_dict = {
+		            images: X,
+		            labels: Y,
+		        }
+		    )
+		    trn_loss = result[1]
+		    trn_acc = result[2]
 		    logitsArray = result[3]
 		    #print(logitsArray)
-                    duration = time.time() - t0
+		    duration = time.time() - t0
 
 
-                    # print debugging info
-                    print("epoch:%5d, step:%5d, trn_loss: %s, precisions YPR : %s, %s, %s" % (epoch, step, trn_loss, trn_acc[0], trn_acc[1], trn_acc[2]))
+		    # print debugging info
+		    print("iter:%5d, trn_loss: %s, precisions YPR : %s, %s, %s" % (iteration, trn_loss, trn_acc[0], trn_acc[1], trn_acc[2]))
                     
 
 
-def getBatch(data, dataLabels, step, batch_size):
-	X = data[step*batch_size:(step+1)*batch_size,:,:]
-	Y = dataLabels[step*batch_size:(step+1)*batch_size,:]
-	return [X,Y]
-                 
-
 if __name__ == '__main__':
-    import dataset
     batch_size = 20
-    folder = '../Cropped/img_014b/GeneratedImgs/014b/Campagne_IR_Pose_20150710/cam1/1'
-
-
-    data = firstscript.load_dataset(folder)
-    dataLabels = firstscript.findLabelsMatrix(folder)
-    train(data, dataLabels,batch_size=batch_size)
+    train(batch_size = batch_size)
