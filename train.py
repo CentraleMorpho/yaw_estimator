@@ -56,6 +56,22 @@ def train(lr=0.0001,
 
 		    # print debugging info
 		    print("iter:%5d, trn_loss: %s, precisions YPR : %s, %s, %s" % (iteration, trn_loss, trn_acc[0], trn_acc[1], trn_acc[2]))
+
+		    if iteration % 10 == 0:
+		    	X, Y = mydatasetbatches.getBatch('validation', batch_size)
+			X=X.reshape((batch_size, 39,39,1))
+
+		        t0 = time.time()
+		    	result = sess.run(
+				[accuracy],
+				feed_dict = {
+			    		images: X,
+			    		labels: Y,
+				}
+		    	)
+		   	trn_acc = result[0]
+			print("iter:%5d, VALIDATION BATCH, precisions YPR : %s, %s, %s" % (iteration, trn_acc[0], trn_acc[1], trn_acc[2]))
+			
                     
 
 
