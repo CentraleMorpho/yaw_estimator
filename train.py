@@ -2,8 +2,6 @@ import vgg as model
 import tensorflow as tf
 import numpy as np
 import time
-import firstscript
-import mydatasetbatches
 import pickle
 
 
