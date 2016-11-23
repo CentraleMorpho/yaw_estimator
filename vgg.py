@@ -45,12 +45,6 @@ def mpool_op(input_op, name, kh, kw, dh, dw):
                           name=name)
 
 def loss_op(logits, labels, batch_size):
-    #labels = tf.expand_dims(labels, 1)
-    #indices = tf.expand_dims(tf.range(0, batch_size, 1), 1)
-    #concated = tf.concat(1, [indices, labels])
-    #onehot_labels = tf.sparse_to_dense(concated, tf.pack([batch_size, 10]), 1.0, 0.0)
-    #cross_entropy = tf.nn.softmax_cross_entropy_with_logits(logits, onehot_labels, name='xentropy')
-    #loss = tf.reduce_mean(cross_entropy, name='xentropy_mean')
     loss = tf.nn.l2_loss(logits-labels)
     return loss
 
@@ -112,8 +106,8 @@ def inference_cifar10_vgg(input_op, training=False):
 def distorted_inputs(data, batch_size):
   """Construct distorted input for CIFAR training using the Reader ops.
   Returns:
-    images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
-    labels: Labels. 1D tensor of [batch_size] size.
+    images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 1] size.
+    labels: Labels. 1D tensor of [batch_size, 3] size.
   Raises:
     ValueError: If no data_dir
   """
@@ -123,10 +117,8 @@ def distorted_inputs(data, batch_size):
 	data_dir = "validationImagesPaths.txt"
   else:
 	raise Exception('Please choose training or test as first argument')
-  images, labels = vgg_input.distorted_inputs(data_dir=data_dir,
+  images, paths = vgg_input.distorted_inputs(data_dir=data_dir,
                                                   batch_size=batch_size)
-  #if FLAGS.use_fp16:
-  #  images = tf.cast(images, tf.float16)
-  #  labels = tf.cast(labels, tf.float16)
-  return images, labels
+
+  return images, paths
 	
