@@ -2,13 +2,6 @@ import os
 import random
 import math
 
-def getImagesPaths():
-	listPaths = []
-	for root, dirs, files in os.walk("../Cropped"):
-	    for file in files:
-		if file.endswith(".png"):
-		     listPaths.append(os.path.join(root, file))
-	return listPaths
 
 def getImagesPathsFromLabelsFile():
 	posesFile = '../Cropped/024_poseonly_normalised180.txt'
@@ -20,15 +13,12 @@ def getImagesPathsFromLabelsFile():
 				path = line.split(' ')[0]
 				if(path.split('/')[0]=='020'):
 					path = os.path.join("../Cropped/GeneratedImgs",path)
-					#path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2],path))
 					listPaths.append(path)
 				elif(path.split('/')[0]=='022'):
 					path = os.path.join("../Cropped/GeneratedImgs",path)
-					#path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2],path))
 					listPaths.append(path)
 				elif(path.split('/')[0]=='014b'):
 					path = os.path.join("../Cropped/img_014b/GeneratedImgs",path)
-					#path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2], path))
 					listPaths.append(path)
 				print(i)
 				i=i+1
