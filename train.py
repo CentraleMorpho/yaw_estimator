@@ -24,6 +24,9 @@ def train(lr=0.0001,
         global_step = tf.Variable(0, name="global_step", trainable=False)
         train_step = optimizer.minimize(objective, global_step=global_step)
 
+	X,Y = model.distorted_inputs('training', batch_size)
+
+
         # Start running operations on the Graph.
         with tf.Session() as sess:
             sess.run(tf.initialize_all_variables())
@@ -32,26 +35,31 @@ def train(lr=0.0001,
             for iteration in range(nb_iterations):
 
 		    # get batch and format data
-		    X, Y = mydatasetbatches.getBatch('training', batch_size)
+		    #X, Y = mydatasetbatches.getBatch('training', batch_size)
 		   
 	     
-		    X=X.reshape((batch_size, 39,39,1))
+		    #X=X.reshape((batch_size, 39,39,1))
 		   
 
 
 		    t0 = time.time()
+		    #result = sess.run(
+			#[train_step, objective, accuracy, logits],
+		        #feed_dict = {
+		        #    images: X,
+		        #    labels: Y,
+		        #}
+		    #)
+
 		    result = sess.run(
-			[train_step, objective, accuracy, logits],
-		        feed_dict = {
-		            images: X,
-		            labels: Y,
-		        }
-		    )
-		    trn_loss = result[1]
-		    trn_acc = result[2]
-		    logitsArray = result[3]
+			[X,Y, train_step, objective, accuracy, logits]
+		    )    
+		    trn_loss = result[3]
+		    trn_acc = result[4]
+		    logitsArray = result[5]
 		    #print(logitsArray)
 		    duration = time.time() - t0
+
 
 
 		    # print debugging info

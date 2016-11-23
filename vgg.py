@@ -4,6 +4,7 @@ import time
 import numpy as np
 import tensorflow.python.platform
 import tensorflow as tf
+import vgg_input
 
 
 def conv_op(input_op, name, kw, kh, n_out, dw, dh):
@@ -107,3 +108,25 @@ def inference_cifar10_vgg(input_op, training=False):
 
     fc8 = fc_op(fc6_drop, name="fc8", n_out=3, reluBool = False)
     return fc8
+
+def distorted_inputs(data, batch_size):
+  """Construct distorted input for CIFAR training using the Reader ops.
+  Returns:
+    images: Images. 4D tensor of [batch_size, IMAGE_SIZE, IMAGE_SIZE, 3] size.
+    labels: Labels. 1D tensor of [batch_size] size.
+  Raises:
+    ValueError: If no data_dir
+  """
+  if(data=='training'):
+	data_dir = "trainingImagesPaths.txt"
+  elif(data=='test'):
+	data_dir = "validationImagesPaths.txt"
+  else:
+	raise Exception('Please choose training or test as first argument')
+  images, labels = vgg_input.distorted_inputs(data_dir=data_dir,
+                                                  batch_size=batch_size)
+  #if FLAGS.use_fp16:
+  #  images = tf.cast(images, tf.float16)
+  #  labels = tf.cast(labels, tf.float16)
+  return images, labels
+	

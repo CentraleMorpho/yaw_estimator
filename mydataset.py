@@ -10,14 +10,41 @@ def getImagesPaths():
 		     listPaths.append(os.path.join(root, file))
 	return listPaths
 
+def getImagesPathsFromLabelsFile():
+	posesFile = '../Cropped/024_poseonly_normalised180.txt'
+	listPaths = []
+	
+	with open(posesFile,'r') as f:
+			i=0
+			for line in f:
+				path = line.split(' ')[0]
+				if(path.split('/')[0]=='020'):
+					path = os.path.join("../Cropped/GeneratedImgs",path)
+					path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2],path))
+					listPaths.append(path)
+				elif(path.split('/')[0]=='022'):
+					path = os.path.join("../Cropped/GeneratedImgs",path)
+					path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2],path))
+					listPaths.append(path)
+				elif(path.split('/')[0]=='014b'):
+					path = os.path.join("../Cropped/img_014b/GeneratedImgs",path)
+					path = ' '.join((line.split(' ')[1],line.split(' ')[2],line.split(' ')[3][0:len(line.split(' ')[3])-2], path))
+					listPaths.append(path)
+				print(i)
+				i=i+1
+				
+	return listPaths
+	
+	
+
 
 if __name__=='__main__':
 	print('Getting all the images paths...')
-	listPaths = getImagesPaths()
+	listPaths = getImagesPathsFromLabelsFile()
 	random.seed(123)
 	print('Shuffling the list')
 	random.shuffle(listPaths)
-	nbTrainingSet = int(math.floor(len(listPaths)*70/100))
+	nbTrainingSet = int(math.floor(len(listPaths)*90/100))
 	print('Creating the training set')
 	trainingSetPaths = listPaths[:nbTrainingSet]
 	print('Creating the validation set')

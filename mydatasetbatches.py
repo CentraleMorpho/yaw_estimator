@@ -8,11 +8,13 @@ def getBatch(data, batch_size):
 	elif data == 'validation':
 		pathsFile = 'validationImagesPaths.txt'
 	else:
-		raise Exception('Please choose training or test as first argument')
+		raise Exception('Please choose training or validation as first argument')
+	
 	
 	with open(pathsFile, 'r') as f:
     		listPaths = [line.rstrip('\n') for line in f]
-
+		
+	print(len(listPaths))
 	image_batch_paths = random.sample(listPaths, batch_size)
 	
 	#Get the images matrix
@@ -34,7 +36,6 @@ def getBatch(data, batch_size):
 	i = 0
 	labelsMatrix = np.zeros([batch_size,3])
 	posesFile = '../Cropped/024_poseonly_normalised180.txt'
-	posesFile20 = '../Cropped/Pose/020_FiV_B33P02_B73_B77_balanced_randomized.txt'
 	for imagePath in image_batch_paths:
 		if(imagePath.split('/')[2]=='img_014b'):
 			imageName = imagePath[34:]
@@ -66,9 +67,9 @@ def getBatch(data, batch_size):
 	
 
 if __name__ == '__main__':
-	imagesMatrix, labelsMatrix = getBatch('training', 10)
+	imagesMatrix, labelsMatrix = getBatch('validation', 10)
 	print(imagesMatrix.shape)
-	print(labelsMatrix.shape)
+	print(labelsMatrix)
 	
 		
 
