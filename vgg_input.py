@@ -27,6 +27,7 @@ def read_cifar10(filename_queue):
   return image, path
 
 
+
 def _generate_image_and_label_batch(image, path, min_queue_examples,
                                     batch_size, shuffle):
   """Construct a queued batch of images and paths.
@@ -60,6 +61,7 @@ def _generate_image_and_label_batch(image, path, min_queue_examples,
 
 
   images = tf.reshape(images,[batch_size,39,39,1])
+  #path_batch = tf.reshape(path_batch,[batch_size])
   path_batch = tf.reshape(path_batch,[batch_size])
 
   return images, path_batch
@@ -84,12 +86,12 @@ def distorted_inputs(data_dir, batch_size):
   print(filename_queue)
 
   # Read examples from files in the filename queue.
+  #image, path = read_cifar10(filename_queue)
   image, path = read_cifar10(filename_queue)
   reshaped_image = tf.cast(image, tf.float32)
 
   height = IMAGE_SIZE
   width = IMAGE_SIZE
-
   
 
   # Ensure that the random shuffling has good mixing properties.

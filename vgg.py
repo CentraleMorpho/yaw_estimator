@@ -5,8 +5,13 @@ import numpy as np
 import tensorflow.python.platform
 import tensorflow as tf
 import vgg_input
+import pickle
 
-
+def init():
+	global dico
+	with open('dictLabels.pkl','rb') as f:
+		dico = pickle.load(f)
+	
 def conv_op(input_op, name, kw, kh, n_out, dw, dh):
     n_in = input_op.get_shape()[-1].value
 
@@ -120,5 +125,17 @@ def distorted_inputs(data, batch_size):
   images, paths = vgg_input.distorted_inputs(data_dir=data_dir,
                                                   batch_size=batch_size)
 
-  return images, paths
+  labels = tf.py_func(getLabels,[paths],[tf.float32])
+  labels = tf.convert_to_tensor(labels, dtype = tf.float32)
+  labels = tf.reshape(labels,[batch_size,3])
+  return images, labels
+
+def getLabels(paths):
+	batch_size=len(paths)
+        labelsEval = np.zeros([batch_size,3], dtype=float)
+        for i in range(0,batch_size):
+		labelsEval[i,:]=dico[paths[i]]
+        labelsEval = np.reshape(labelsEval,(batch_size,3))
+        labelsEval = labelsEval.astype(np.float32)
+	return labelsEval
 	
